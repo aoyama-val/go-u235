@@ -48,16 +48,8 @@ func main() {
 		panic(err)
 	}
 
-	// Initialize SDL2 mixer
-	if err := mix.Init(int(mix.WAV)); err != nil {
-		panic("cannot init mixer")
-	}
+	initMixer()
 	defer mix.Quit()
-
-	// Open default playback device
-	if err := mix.OpenAudio(int(mix.DEFAULT_FREQUENCY), uint16(mix.DEFAULT_FORMAT), int(mix.DEFAULT_CHANNELS), mix.DEFAULT_CHUNKSIZE); err != nil {
-		panic("cannot open audio")
-	}
 	defer mix.CloseAudio()
 
 	resources := loadResources(renderer)
@@ -94,6 +86,16 @@ func main() {
 		game.Update(command)
 		render(renderer, window, game, resources)
 		time.Sleep((1000 / FPS) * time.Millisecond)
+	}
+}
+
+func initMixer() {
+	if err := mix.Init(int(mix.WAV)); err != nil {
+		panic("cannot init mixer")
+	}
+
+	if err := mix.OpenAudio(mix.DEFAULT_FREQUENCY, mix.DEFAULT_FORMAT, mix.DEFAULT_CHANNELS, mix.DEFAULT_CHUNKSIZE); err != nil {
+		panic("cannot open audio")
 	}
 }
 
@@ -162,25 +164,25 @@ func render(renderer *sdl.Renderer, window *sdl.Window, game *m.Game, resources 
 		renderer.FillRect(&sdl.Rect{X: 0, Y: 0, W: SCREEEN_WIDTH, H: SCREEN_HEIGHT})
 	}
 
-	renderTexture(renderer, resources, "player.bmp", int32(CELL_SIZE_PX*game.Player.X), int32(CELL_SIZE_PX*game.Player.Y))
-	renderTexture(renderer, resources, "title.bmp", CELL_SIZE_PX*1, 0)
+	renderTexture(renderer, resources, "player.bmp", game.Player.X, game.Player.Y)
+	renderTexture(renderer, resources, "title.bmp", 1, 0)
 
 	for i := 1; i <= 22; i++ {
-		renderTexture(renderer, resources, "wall.bmp", int32(CELL_SIZE_PX*(m.X_MIN-1)), int32(CELL_SIZE_PX*i))
-		renderTexture(renderer, resources, "wall.bmp", int32(CELL_SIZE_PX*(m.X_MAX+1)), int32(CELL_SIZE_PX*i))
+		renderTexture(renderer, resources, "wall.bmp", m.X_MIN-1, i)
+		renderTexture(renderer, resources, "wall.bmp", m.X_MAX+1, i)
 	}
 	for i := m.X_MIN; i <= m.X_MAX; i++ {
-		renderTexture(renderer, resources, "wall.bmp", int32(CELL_SIZE_PX*i), CELL_SIZE_PX*1)
+		renderTexture(renderer, resources, "wall.bmp", i, 1)
 	}
 
 	for i := 0; i < SCREEEN_WIDTH/CELL_SIZE_PX; i++ {
-		renderTexture(renderer, resources, "back.bmp", int32(CELL_SIZE_PX*i), CELL_SIZE_PX*(m.Y_MAX+1))
+		renderTexture(renderer, resources, "back.bmp", i, m.Y_MAX+1)
 	}
 
 	renderer.Present()
 }
 
-func renderTexture(renderer *sdl.Renderer, resources *Resources, textureKey string, x int32, y int32) {
+func renderTexture(renderer *sdl.Renderer, resources *Resources, textureKey string, x int, y int) {
 	texture := resources.textures[textureKey]
-	renderer.Copy(texture.texture, nil, &sdl.Rect{X: x, Y: y, W: texture.w, H: texture.h})
+	renderer.Copy(texture.texture, nil, &sdl.Rect{X: int32(CELL_SIZE_PX * x), Y: int32(CELL_SIZE_PX * y), W: texture.w, H: texture.h})
 }
