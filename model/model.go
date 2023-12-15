@@ -39,9 +39,9 @@ type Game struct {
 	Rng       *rand.Rand
 	IsOver    bool
 	Frame     int32
-	Player    Player
-	Bullets   []Bullet
-	Targets   []Target
+	Player    *Player
+	Bullets   []*Bullet
+	Targets   []*Target
 	Score     int
 	HighScore int
 }
@@ -68,10 +68,12 @@ func NewGame() *Game {
 	g.Rng = rng
 	g.IsOver = false
 	g.Frame = 0
-	g.Player.X = 18
-	g.Player.Y = Y_MAX
-	g.Bullets = make([]Bullet, 0, 10)
-	g.Targets = make([]Target, 0, 100)
+	g.Player = &Player{
+		X: 18,
+		Y: Y_MAX,
+	}
+	g.Bullets = make([]*Bullet, 0, 10)
+	g.Targets = make([]*Target, 0, 100)
 	return g
 }
 
@@ -99,7 +101,7 @@ func (g *Game) Update(command string) {
 }
 
 func (g *Game) spawnTarget() {
-	target := Target{
+	target := &Target{
 		X: RandRange(g.Rng, X_MIN+1, X_MAX-1),
 		Y: RandRange(g.Rng, Y_MIN, 15),
 	}
@@ -107,7 +109,7 @@ func (g *Game) spawnTarget() {
 }
 
 func (g *Game) shoot() {
-	bullet := Bullet{
+	bullet := &Bullet{
 		X:         g.Player.X + 1,
 		Y:         g.Player.Y - 1,
 		Direction: DIRECTION_UP,
