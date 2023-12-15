@@ -1,4 +1,4 @@
-program = u235
+program = ./u235
 
 .PHONY: all
 all: build run

@@ -14,6 +14,10 @@ const (
 	FPS           = 30
 )
 
+type Resources struct {
+	textures map[string]*sdl.Texture
+}
+
 func main() {
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
 		panic(err)
@@ -35,6 +39,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	resources := loadResources(renderer)
 
 	running := true
 	game := m.NewGame()
@@ -64,12 +70,46 @@ func main() {
 			}
 		}
 		game.Update(command)
-		render(renderer, window, game)
+		render(renderer, window, game, resources)
 		time.Sleep((1000 / FPS) * time.Millisecond)
 	}
 }
 
-func render(renderer *sdl.Renderer, window *sdl.Window, game *m.Game) {
+func loadResources(renderer *sdl.Renderer) *Resources {
+	var resources Resources
+	var err error
+	var image *sdl.Surface
+
+	var imagePaths []string = []string{
+		"back.bmp",
+		"down.bmp",
+		"dust.bmp",
+		"left.bmp",
+		"player.bmp",
+		"right.bmp",
+		"target.bmp",
+		"title.bmp",
+		"up.bmp",
+		"wall.bmp",
+	}
+
+	resources.textures = make(map[string]*sdl.Texture)
+	for _, path := range imagePaths {
+		fullPath := "resources/image/" + path
+		if image, err = sdl.LoadBMP(fullPath); err != nil {
+			panic("cannot load image: " + path)
+		}
+		texture, err := renderer.CreateTextureFromSurface(image)
+		if err != nil {
+			panic("cannot convert to texture: " + path)
+		}
+		resources.textures[path] = texture
+	}
+
+	return &resources
+}
+
+func render(renderer *sdl.Renderer, window *sdl.Window, game *m.Game, resources *Resources) {
 	renderer.SetDrawColor(0, 0, 0, 0)
 	renderer.Clear()
 
@@ -78,5 +118,16 @@ func render(renderer *sdl.Renderer, window *sdl.Window, game *m.Game) {
 		renderer.FillRect(&sdl.Rect{X: 0, Y: 0, W: SCREEEN_WIDTH, H: SCREEN_HEIGHT})
 	}
 
+	renderTexture(renderer, resources, "player.bmp", 100, 150)
+	renderTexture(renderer, resources, "title.bmp", 100, 350)
 	renderer.Present()
+}
+
+func renderTexture(renderer *sdl.Renderer, resources *Resources, textureKey string, x int32, y int32) {
+	texture := resources.textures[textureKey]
+	_, _, w, h, err := texture.Query()
+	if err != nil {
+		panic("cannot query texture: " + textureKey)
+	}
+	renderer.Copy(texture, nil, &sdl.Rect{X: x, Y: y, W: w, H: h})
 }
