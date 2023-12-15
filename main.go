@@ -167,7 +167,6 @@ func render(renderer *sdl.Renderer, window *sdl.Window, game *m.Game, resources 
 		renderer.FillRect(&sdl.Rect{X: 0, Y: 0, W: SCREEEN_WIDTH, H: SCREEN_HEIGHT})
 	}
 
-	renderTexture(renderer, resources, "player.bmp", game.Player.X, game.Player.Y)
 	renderTexture(renderer, resources, "title.bmp", 1, 0)
 
 	for i := 1; i <= 22; i++ {
@@ -184,6 +183,25 @@ func render(renderer *sdl.Renderer, window *sdl.Window, game *m.Game, resources 
 
 	renderNumber(renderer, resources, 18, 0, fmt.Sprintf("%8d", game.HighScore))
 	renderNumber(renderer, resources, 32, 0, fmt.Sprintf("%8d", game.Score))
+
+	renderTexture(renderer, resources, "player.bmp", game.Player.X, game.Player.Y)
+
+	for _, bullet := range game.Bullets {
+		switch bullet.Direction {
+		case m.DIRECTION_LEFT:
+			renderTexture(renderer, resources, "left.bmp", bullet.X, bullet.Y)
+		case m.DIRECTION_RIGHT:
+			renderTexture(renderer, resources, "right.bmp", bullet.X, bullet.Y)
+		case m.DIRECTION_UP:
+			renderTexture(renderer, resources, "up.bmp", bullet.X, bullet.Y)
+		case m.DIRECTION_DOWN:
+			renderTexture(renderer, resources, "down.bmp", bullet.X, bullet.Y)
+		}
+	}
+
+	for _, target := range game.Targets {
+		renderTexture(renderer, resources, "target.bmp", target.X, target.Y)
+	}
 
 	renderer.Present()
 }
