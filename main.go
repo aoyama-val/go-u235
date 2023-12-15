@@ -4,6 +4,7 @@ import (
 	"time"
 
 	m "github.com/aoyama-val/go-u235/model"
+	"github.com/veandco/go-sdl2/mix"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -16,6 +17,7 @@ const (
 
 type Resources struct {
 	textures map[string]*sdl.Texture
+	chunks   map[string]*mix.Chunk
 }
 
 func main() {
@@ -40,6 +42,18 @@ func main() {
 		panic(err)
 	}
 
+	// Initialize SDL2 mixer
+	if err := mix.Init(int(mix.WAV)); err != nil {
+		panic("cannot init mixer")
+	}
+	defer mix.Quit()
+
+	// Open default playback device
+	if err := mix.OpenAudio(int(mix.DEFAULT_FREQUENCY), uint16(mix.DEFAULT_FORMAT), int(mix.DEFAULT_CHANNELS), mix.DEFAULT_CHUNKSIZE); err != nil {
+		panic("cannot open audio")
+	}
+	defer mix.CloseAudio()
+
 	resources := loadResources(renderer)
 
 	running := true
@@ -63,6 +77,8 @@ func main() {
 						command = "right"
 					case sdl.K_LSHIFT:
 						command = "shoot"
+						chunk := resources.chunks["hit.wav"]
+						chunk.Play(-1, 0)
 					case sdl.K_RSHIFT:
 						command = "shoot"
 					}
@@ -106,6 +122,21 @@ func loadResources(renderer *sdl.Renderer) *Resources {
 		resources.textures[path] = texture
 	}
 
+	// Load WAV file with short duration as *mix.Chunk
+	var soundPaths []string = []string{
+		"crash.wav",
+		"hit.wav",
+	}
+
+	resources.chunks = make(map[string]*mix.Chunk)
+	for _, path := range soundPaths {
+		fullPath := "resources/sound/" + path
+		chunk, err := mix.LoadWAV(fullPath)
+		if err != nil {
+			panic("cannot load wav: " + path)
+		}
+		resources.chunks[path] = chunk
+	}
 	return &resources
 }
 
