@@ -11,7 +11,7 @@ import (
 const (
 	SCREEEN_WIDTH = 640
 	SCREEN_HEIGHT = 400
-	CELL_SIZE_PX  = 20
+	CELL_SIZE_PX  = 16
 	FPS           = 30
 )
 
@@ -72,7 +72,7 @@ func main() {
 			case *sdl.QuitEvent:
 				running = false
 			case *sdl.KeyboardEvent:
-				if t.State == sdl.PRESSED && t.Repeat == 0 {
+				if t.State == sdl.PRESSED {
 					keyCode := t.Keysym.Sym
 					switch keyCode {
 					case sdl.K_ESCAPE:
@@ -162,8 +162,21 @@ func render(renderer *sdl.Renderer, window *sdl.Window, game *m.Game, resources 
 		renderer.FillRect(&sdl.Rect{X: 0, Y: 0, W: SCREEEN_WIDTH, H: SCREEN_HEIGHT})
 	}
 
-	renderTexture(renderer, resources, "player.bmp", 100, 150)
-	renderTexture(renderer, resources, "title.bmp", 100, 350)
+	renderTexture(renderer, resources, "player.bmp", int32(CELL_SIZE_PX*game.Player.X), int32(CELL_SIZE_PX*game.Player.Y))
+	renderTexture(renderer, resources, "title.bmp", CELL_SIZE_PX*1, 0)
+
+	for i := 1; i <= 22; i++ {
+		renderTexture(renderer, resources, "wall.bmp", int32(CELL_SIZE_PX*(m.X_MIN-1)), int32(CELL_SIZE_PX*i))
+		renderTexture(renderer, resources, "wall.bmp", int32(CELL_SIZE_PX*(m.X_MAX+1)), int32(CELL_SIZE_PX*i))
+	}
+	for i := m.X_MIN; i <= m.X_MAX; i++ {
+		renderTexture(renderer, resources, "wall.bmp", int32(CELL_SIZE_PX*i), CELL_SIZE_PX*1)
+	}
+
+	for i := 0; i < SCREEEN_WIDTH/CELL_SIZE_PX; i++ {
+		renderTexture(renderer, resources, "back.bmp", int32(CELL_SIZE_PX*i), CELL_SIZE_PX*(m.Y_MAX+1))
+	}
+
 	renderer.Present()
 }
 
