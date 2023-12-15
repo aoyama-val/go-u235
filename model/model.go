@@ -18,10 +18,12 @@ type Player struct {
 }
 
 type Game struct {
-	Rng    *rand.Rand
-	IsOver bool
-	Frame  int32
-	Player Player
+	Rng       *rand.Rand
+	IsOver    bool
+	Frame     int32
+	Player    Player
+	Score     int
+	HighScore int
 }
 
 func Clamp(min int, val int, max int) int {

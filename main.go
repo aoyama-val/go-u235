@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	m "github.com/aoyama-val/go-u235/model"
@@ -83,6 +84,7 @@ func main() {
 				}
 			}
 		}
+		game.Score += 1
 		game.Update(command)
 		render(renderer, window, game, resources)
 		time.Sleep((1000 / FPS) * time.Millisecond)
@@ -109,6 +111,7 @@ func loadResources(renderer *sdl.Renderer) *Resources {
 		"down.bmp",
 		"dust.bmp",
 		"left.bmp",
+		"numbers.bmp",
 		"player.bmp",
 		"right.bmp",
 		"target.bmp",
@@ -179,10 +182,31 @@ func render(renderer *sdl.Renderer, window *sdl.Window, game *m.Game, resources 
 		renderTexture(renderer, resources, "back.bmp", i, m.Y_MAX+1)
 	}
 
+	renderNumber(renderer, resources, 18, 0, fmt.Sprintf("%8d", game.HighScore))
+	renderNumber(renderer, resources, 32, 0, fmt.Sprintf("%8d", game.Score))
+
 	renderer.Present()
 }
 
 func renderTexture(renderer *sdl.Renderer, resources *Resources, textureKey string, x int, y int) {
 	texture := resources.textures[textureKey]
 	renderer.Copy(texture.texture, nil, &sdl.Rect{X: int32(CELL_SIZE_PX * x), Y: int32(CELL_SIZE_PX * y), W: texture.w, H: texture.h})
+}
+
+func renderNumber(renderer *sdl.Renderer, resources *Resources, x int, y int, numstr string) {
+	texture := resources.textures["numbers.bmp"]
+	digitWidthInPx := 8
+	xInPx := int32(CELL_SIZE_PX * x)
+	yInPx := int32(CELL_SIZE_PX * y)
+	for i := 0; i < len(numstr); i++ {
+		digit := numstr[i]
+		if 0x30 <= digit && digit <= 0x39 {
+			renderer.Copy(
+				texture.texture,
+				&sdl.Rect{X: int32(digitWidthInPx * int(digit-0x30)), Y: 0, W: int32(digitWidthInPx), H: texture.h},
+				&sdl.Rect{X: xInPx, Y: yInPx, W: int32(digitWidthInPx), H: texture.h},
+			)
+		}
+		xInPx += int32(digitWidthInPx)
+	}
 }
