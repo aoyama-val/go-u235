@@ -3,7 +3,7 @@
 U235 written in Go.
 
 - [x] soundを再生する
-- [] textureをqueryした結果を保存しておく
+- [x] textureをqueryした結果を保存しておく
 - [] 初期画面を描画する
 - [] playerを移動できるようにする
 - [] 弾を発射できるようにする

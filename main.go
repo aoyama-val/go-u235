@@ -15,8 +15,14 @@ const (
 	FPS           = 30
 )
 
+type Texture struct {
+	texture *sdl.Texture
+	w       int32
+	h       int32
+}
+
 type Resources struct {
-	textures map[string]*sdl.Texture
+	textures map[string]*Texture
 	chunks   map[string]*mix.Chunk
 }
 
@@ -93,8 +99,8 @@ func main() {
 
 func loadResources(renderer *sdl.Renderer) *Resources {
 	var resources Resources
-	var err error
-	var image *sdl.Surface
+	resources.textures = make(map[string]*Texture)
+	resources.chunks = make(map[string]*mix.Chunk)
 
 	var imagePaths []string = []string{
 		"back.bmp",
@@ -108,27 +114,33 @@ func loadResources(renderer *sdl.Renderer) *Resources {
 		"up.bmp",
 		"wall.bmp",
 	}
-
-	resources.textures = make(map[string]*sdl.Texture)
 	for _, path := range imagePaths {
 		fullPath := "resources/image/" + path
-		if image, err = sdl.LoadBMP(fullPath); err != nil {
+		image, err := sdl.LoadBMP(fullPath)
+		if err != nil {
 			panic("cannot load image: " + path)
 		}
 		texture, err := renderer.CreateTextureFromSurface(image)
 		if err != nil {
 			panic("cannot convert to texture: " + path)
 		}
-		resources.textures[path] = texture
+
+		_, _, w, h, err := texture.Query()
+		if err != nil {
+			panic("cannot query texture: " + path)
+		}
+
+		resources.textures[path] = &Texture{
+			texture: texture,
+			w:       w,
+			h:       h,
+		}
 	}
 
-	// Load WAV file with short duration as *mix.Chunk
 	var soundPaths []string = []string{
 		"crash.wav",
 		"hit.wav",
 	}
-
-	resources.chunks = make(map[string]*mix.Chunk)
 	for _, path := range soundPaths {
 		fullPath := "resources/sound/" + path
 		chunk, err := mix.LoadWAV(fullPath)
@@ -137,6 +149,7 @@ func loadResources(renderer *sdl.Renderer) *Resources {
 		}
 		resources.chunks[path] = chunk
 	}
+
 	return &resources
 }
 
@@ -156,9 +169,5 @@ func render(renderer *sdl.Renderer, window *sdl.Window, game *m.Game, resources 
 
 func renderTexture(renderer *sdl.Renderer, resources *Resources, textureKey string, x int32, y int32) {
 	texture := resources.textures[textureKey]
-	_, _, w, h, err := texture.Query()
-	if err != nil {
-		panic("cannot query texture: " + textureKey)
-	}
-	renderer.Copy(texture, nil, &sdl.Rect{X: x, Y: y, W: w, H: h})
+	renderer.Copy(texture.texture, nil, &sdl.Rect{X: x, Y: y, W: texture.w, H: texture.h})
 }
