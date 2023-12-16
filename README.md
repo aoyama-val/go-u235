@@ -1,18 +1,34 @@
 # go-u235
 
-U235 written in Go.
+U235 game written in Go.
 
-- [x] soundを再生する
-- [x] textureをqueryした結果を保存しておく
-- [x] 初期画面を描画する
-- [x] playerを移動できるようにする
-- [x] 弾を発射できるようにする
-- [x] 弾が移動するように
-- [x] 弾が壁で反射するように
-- [x] 弾が自機に当たったらゲームオーバー
-- [x] 的を生成する
-- [x] サウンド再生
-- [x] 的に当たったら消える
-- [x] 的に当たったら中性子を拡散
-- [x] ゲームオーバー後にスペースキーでリスタート
-- [x] 的生成速度調整
+PC98のゲーム『原発』を真似て作られた<a href="http://www.vector.co.jp/soft/win95/game/se107895.html">『U235』</a>を真似て作ったゲーム（フリーソフト）です。
+
+https://github.com/aoyama-val/go-u235/assets/13144822/c72ff3eb-ded7-4d24-951c-f24172c3cd9a
+
+## Requirement
+
+- SDL 2
+- Go
+
+## Build
+
+```
+$ make
+```
+
+## Run
+
+```
+$ ./u235
+```
+
+## Key bindings
+
+```
+Left   : Move player left
+Right  : Move player right
+Shift  : Shoot
+Escape : Quit game
+Space  : Restart when game over
+```
