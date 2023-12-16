@@ -19,6 +19,16 @@ const (
 	DIRECTION_DOWN  = 3
 )
 
+type Command string
+
+const (
+	COMMAND_LEFT    = Command("left")
+	COMMAND_RIGHT   = Command("right")
+	COMMAND_SHOOT   = Command("shoot")
+	COMMAND_QUIT    = Command("quit")
+	COMMAND_RESTART = Command("restart")
+)
+
 type Player struct {
 	X int
 	Y int
@@ -85,7 +95,7 @@ func (g *Game) Reset() {
 	g.Score = 0
 }
 
-func (g *Game) Update(commands []string) {
+func (g *Game) Update(commands []Command) {
 	if g.IsOver {
 		return
 	}
@@ -119,7 +129,7 @@ func (g *Game) Update(commands []string) {
 	g.Frame += 1
 }
 
-func (g *Game) handleCommands(commands []string) {
+func (g *Game) handleCommands(commands []Command) {
 	for _, command := range commands {
 		switch command {
 		case "left":

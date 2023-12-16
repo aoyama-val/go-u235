@@ -66,11 +66,11 @@ func main() {
 
 	for running {
 		commands := GetCommands()
-		if commands == nil {
+		if len(commands) > 0 && commands[0] == m.COMMAND_QUIT {
 			running = false
 			break
 		}
-		if game.IsOver && len(commands) > 0 && commands[0] == "restart" {
+		if game.IsOver && len(commands) > 0 && commands[0] == m.COMMAND_RESTART {
 			game.Reset()
 			continue
 		}
@@ -96,23 +96,23 @@ func printUsage() {
 	fmt.Printf("    Space  : Restart when game over\n")
 }
 
-func GetCommands() []string {
-	commands := make([]string, 0, 3)
+func GetCommands() []m.Command {
+	commands := make([]m.Command, 0, 3)
 	keyState := sdl.GetKeyboardState()
 	if keyState[sdl.SCANCODE_LEFT] != 0 {
-		commands = append(commands, "left")
+		commands = append(commands, m.COMMAND_LEFT)
 	}
 	if keyState[sdl.SCANCODE_RIGHT] != 0 {
-		commands = append(commands, "right")
+		commands = append(commands, m.COMMAND_RIGHT)
 	}
 	if keyState[sdl.SCANCODE_LSHIFT] != 0 || keyState[sdl.SCANCODE_RSHIFT] != 0 {
-		commands = append(commands, "shoot")
+		commands = append(commands, m.COMMAND_SHOOT)
 	}
 	if keyState[sdl.SCANCODE_ESCAPE] != 0 {
-		commands = nil
+		commands = append(commands, m.COMMAND_QUIT)
 	}
 	if keyState[sdl.SCANCODE_SPACE] != 0 {
-		commands = append(commands, "restart")
+		commands = append(commands, m.COMMAND_RESTART)
 	}
 	return commands
 }
