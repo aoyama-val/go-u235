@@ -80,8 +80,8 @@ func (g *Game) Reset() {
 		X: 18,
 		Y: Y_MAX,
 	}
-	g.Bullets = make([]*Bullet, 0, 10)
-	g.Targets = make([]*Target, 0, 100)
+	g.Bullets = make([]*Bullet, 0, 100)
+	g.Targets = make([]*Target, 0, 50)
 	g.Score = 0
 }
 
