@@ -71,6 +71,7 @@ func main() {
 		}
 		game.Update(commands)
 		render(renderer, window, game, resources)
+		playSounds(game, resources)
 		time.Sleep((1000 / FPS) * time.Millisecond)
 	}
 }
@@ -229,4 +230,12 @@ func renderNumber(renderer *sdl.Renderer, resources *Resources, x int, y int, nu
 		}
 		xInPx += int32(digitWidthInPx)
 	}
+}
+
+func playSounds(game *m.Game, resources *Resources) {
+	for _, requestedSound := range game.RequestedSounds {
+		chunk := resources.chunks[requestedSound]
+		chunk.Play(-1, 0)
+	}
+	game.RequestedSounds = nil
 }

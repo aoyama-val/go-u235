@@ -38,14 +38,15 @@ type Target struct {
 }
 
 type Game struct {
-	Rng       *rand.Rand
-	IsOver    bool
-	Frame     int32
-	Player    *Player
-	Bullets   []*Bullet
-	Targets   []*Target
-	Score     int
-	HighScore int
+	Rng             *rand.Rand
+	IsOver          bool
+	Frame           int32
+	Player          *Player
+	Bullets         []*Bullet
+	Targets         []*Target
+	Score           int
+	HighScore       int
+	RequestedSounds []string
 }
 
 func Clamp(min int, val int, max int) int {
@@ -106,7 +107,7 @@ func (g *Game) Update(commands []string) {
 	}
 	g.Targets = removedTargets
 
-	if g.Frame%60 == 0 {
+	if g.Frame%30 == 0 {
 		g.spawnTarget()
 	}
 
@@ -160,11 +161,26 @@ func (g *Game) moveBullets() {
 }
 
 func (g *Game) checkCollision() {
+	newBullets := make([]*Bullet, 0)
 	for _, bullet := range g.Bullets {
 		if g.Player.X <= bullet.X && bullet.X <= g.Player.X+2 && g.Player.Y == bullet.Y {
 			g.IsOver = true
+			g.playSound("crash.wav")
+		}
+
+		for _, target := range g.Targets {
+			if bullet.X == target.X && bullet.Y == target.Y {
+				bullet.ShouldRemove = true
+				target.ShouldRemove = true
+				newBullets = append(newBullets, &Bullet{X: bullet.X, Y: bullet.Y, Direction: DIRECTION_LEFT})
+				newBullets = append(newBullets, &Bullet{X: bullet.X, Y: bullet.Y, Direction: DIRECTION_RIGHT})
+				newBullets = append(newBullets, &Bullet{X: bullet.X, Y: bullet.Y, Direction: DIRECTION_UP})
+				newBullets = append(newBullets, &Bullet{X: bullet.X, Y: bullet.Y, Direction: DIRECTION_DOWN})
+				g.playSound("hit.wav")
+			}
 		}
 	}
+	g.Bullets = append(g.Bullets, newBullets...)
 }
 
 func (g *Game) spawnTarget() {
@@ -182,4 +198,8 @@ func (g *Game) shoot() {
 		Direction: DIRECTION_UP,
 	}
 	g.Bullets = append(g.Bullets, bullet)
+}
+
+func (g *Game) playSound(soundKey string) {
+	g.RequestedSounds = append(g.RequestedSounds, soundKey)
 }
