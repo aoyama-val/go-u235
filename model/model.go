@@ -112,7 +112,7 @@ func (g *Game) Update(commands []string) {
 	}
 	g.Targets = removedTargets
 
-	if g.Frame%30 == 0 {
+	if g.Rng.Float64() < 0.05 {
 		g.spawnTarget()
 	}
 
