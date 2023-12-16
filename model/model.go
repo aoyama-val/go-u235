@@ -128,7 +128,7 @@ func (g *Game) Update(commands []Command) {
 	}
 	g.Targets = removedTargets
 
-	if g.Rng.Float64() < 0.05 {
+	if g.Rng.Float64() < 0.07 && len(g.Targets) < 80 {
 		g.spawnTarget()
 	}
 
@@ -212,6 +212,11 @@ func (g *Game) spawnTarget() {
 	target := &Target{
 		X: RandRange(g.Rng, X_MIN+1, X_MAX-1),
 		Y: RandRange(g.Rng, Y_MIN, 15),
+	}
+	for _, t := range g.Targets {
+		if t.X == target.X && t.Y == target.Y {
+			return
+		}
 	}
 	g.Targets = append(g.Targets, target)
 }
