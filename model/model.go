@@ -32,8 +32,9 @@ type Bullet struct {
 }
 
 type Target struct {
-	X int
-	Y int
+	X            int
+	Y            int
+	ShouldRemove bool
 }
 
 type Game struct {
@@ -85,6 +86,49 @@ func (g *Game) Update(commands []string) {
 
 	g.handleCommands(commands)
 
+	g.moveBullets()
+
+	g.checkCollision()
+
+	removedBullets := make([]*Bullet, 0, cap(g.Bullets))
+	for _, bullet := range g.Bullets {
+		if !bullet.ShouldRemove {
+			removedBullets = append(removedBullets, bullet)
+		}
+	}
+	g.Bullets = removedBullets
+
+	removedTargets := make([]*Target, 0, cap(g.Targets))
+	for _, target := range g.Targets {
+		if !target.ShouldRemove {
+			removedTargets = append(removedTargets, target)
+		}
+	}
+	g.Targets = removedTargets
+
+	if g.Frame%60 == 0 {
+		g.spawnTarget()
+	}
+
+	g.Frame += 1
+}
+
+func (g *Game) handleCommands(commands []string) {
+	for _, command := range commands {
+		switch command {
+		case "left":
+			g.Player.X -= 1
+			g.Player.X = Clamp(X_MIN, g.Player.X, X_MAX)
+		case "right":
+			g.Player.X += 1
+			g.Player.X = Clamp(X_MIN, g.Player.X, X_MAX-2)
+		case "shoot":
+			g.shoot()
+		}
+	}
+}
+
+func (g *Game) moveBullets() {
 	for _, bullet := range g.Bullets {
 		switch bullet.Direction {
 		case DIRECTION_LEFT:
@@ -113,42 +157,14 @@ func (g *Game) Update(commands []string) {
 			}
 		}
 	}
+}
 
+func (g *Game) checkCollision() {
 	for _, bullet := range g.Bullets {
 		if g.Player.X <= bullet.X && bullet.X <= g.Player.X+2 && g.Player.Y == bullet.Y {
 			g.IsOver = true
 		}
 	}
-
-	removedBullets := make([]*Bullet, 0, cap(g.Bullets))
-	for _, bullet := range g.Bullets {
-		if !bullet.ShouldRemove {
-			removedBullets = append(removedBullets, bullet)
-		}
-	}
-	g.Bullets = removedBullets
-
-	if g.Frame%60 == 0 {
-		g.spawnTarget()
-	}
-
-	g.Frame += 1
-}
-
-func (g *Game) handleCommands(commands []string) {
-	for _, command := range commands {
-		switch command {
-		case "left":
-			g.Player.X -= 1
-			g.Player.X = Clamp(X_MIN, g.Player.X, X_MAX)
-		case "right":
-			g.Player.X += 1
-			g.Player.X = Clamp(X_MIN, g.Player.X, X_MAX-2)
-		case "shoot":
-			g.shoot()
-		}
-	}
-
 }
 
 func (g *Game) spawnTarget() {

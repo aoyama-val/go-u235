@@ -59,18 +59,8 @@ func main() {
 	game := m.NewGame()
 
 	for running {
-		commands := make([]string, 0, 3)
-		keyState := sdl.GetKeyboardState()
-		if keyState[sdl.SCANCODE_LEFT] != 0 {
-			commands = append(commands, "left")
-		}
-		if keyState[sdl.SCANCODE_RIGHT] != 0 {
-			commands = append(commands, "right")
-		}
-		if keyState[sdl.SCANCODE_LSHIFT] != 0 || keyState[sdl.SCANCODE_RSHIFT] != 0 {
-			commands = append(commands, "shoot")
-		}
-		if keyState[sdl.SCANCODE_ESCAPE] != 0 {
+		commands := GetCommands()
+		if commands == nil {
 			running = false
 		}
 		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
@@ -79,11 +69,28 @@ func main() {
 				running = false
 			}
 		}
-		game.Score += 1
 		game.Update(commands)
 		render(renderer, window, game, resources)
 		time.Sleep((1000 / FPS) * time.Millisecond)
 	}
+}
+
+func GetCommands() []string {
+	commands := make([]string, 0, 3)
+	keyState := sdl.GetKeyboardState()
+	if keyState[sdl.SCANCODE_LEFT] != 0 {
+		commands = append(commands, "left")
+	}
+	if keyState[sdl.SCANCODE_RIGHT] != 0 {
+		commands = append(commands, "right")
+	}
+	if keyState[sdl.SCANCODE_LSHIFT] != 0 || keyState[sdl.SCANCODE_RSHIFT] != 0 {
+		commands = append(commands, "shoot")
+	}
+	if keyState[sdl.SCANCODE_ESCAPE] != 0 {
+		commands = nil
+	}
+	return commands
 }
 
 func initMixer() {
