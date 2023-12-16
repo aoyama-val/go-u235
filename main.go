@@ -71,7 +71,7 @@ func main() {
 			break
 		}
 		if game.IsOver && len(commands) > 0 && commands[0] == m.COMMAND_RESTART {
-			game.Reset()
+			game = game.Restart()
 			continue
 		}
 		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
