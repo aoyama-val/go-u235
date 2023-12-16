@@ -65,6 +65,7 @@ func main() {
 	printUsage()
 
 	for running {
+		started := time.Now().UnixMilli()
 		commands := GetCommands()
 		if len(commands) > 0 && commands[0] == m.COMMAND_QUIT {
 			running = false
@@ -83,7 +84,8 @@ func main() {
 		game.Update(commands)
 		render(renderer, window, game, resources)
 		playSounds(game, resources)
-		time.Sleep((1000 / FPS) * time.Millisecond)
+		finished := time.Now().UnixMilli()
+		time.Sleep(time.Duration(1000/FPS-int(finished-started)) * time.Millisecond)
 	}
 }
 
