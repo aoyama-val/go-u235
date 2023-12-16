@@ -4,7 +4,9 @@ program = ./u235
 all: build run
 
 .PHONY: build
-build: main.go
+build: $(program)
+
+$(program): main.go model/model.go
 	go build -o $(program)
 
 .PHONY: clean
