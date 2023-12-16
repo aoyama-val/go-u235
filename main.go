@@ -157,11 +157,6 @@ func render(renderer *sdl.Renderer, window *sdl.Window, game *m.Game, resources 
 	renderer.SetDrawColor(0, 0, 0, 0)
 	renderer.Clear()
 
-	if game.IsOver {
-		renderer.SetDrawColor(0, 0, 0, 128)
-		renderer.FillRect(&sdl.Rect{X: 0, Y: 0, W: SCREEEN_WIDTH, H: SCREEN_HEIGHT})
-	}
-
 	renderTexture(renderer, resources, "title.bmp", 1, 0)
 
 	for i := 1; i <= 22; i++ {
@@ -196,6 +191,11 @@ func render(renderer *sdl.Renderer, window *sdl.Window, game *m.Game, resources 
 
 	for _, target := range game.Targets {
 		renderTexture(renderer, resources, "target.bmp", target.X, target.Y)
+	}
+
+	if game.IsOver {
+		renderer.SetDrawColor(255, 0, 0, 128)
+		renderer.FillRect(&sdl.Rect{X: 0, Y: 0, W: SCREEEN_WIDTH, H: SCREEN_HEIGHT})
 	}
 
 	renderer.Present()

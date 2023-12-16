@@ -83,18 +83,7 @@ func (g *Game) Update(commands []string) {
 		return
 	}
 
-	for _, command := range commands {
-		switch command {
-		case "left":
-			g.Player.X -= 1
-			g.Player.X = Clamp(X_MIN, g.Player.X, X_MAX)
-		case "right":
-			g.Player.X += 1
-			g.Player.X = Clamp(X_MIN, g.Player.X, X_MAX-2)
-		case "shoot":
-			g.shoot()
-		}
-	}
+	g.handleCommands(commands)
 
 	for _, bullet := range g.Bullets {
 		switch bullet.Direction {
@@ -125,6 +114,12 @@ func (g *Game) Update(commands []string) {
 		}
 	}
 
+	for _, bullet := range g.Bullets {
+		if g.Player.X <= bullet.X && bullet.X <= g.Player.X+2 && g.Player.Y == bullet.Y {
+			g.IsOver = true
+		}
+	}
+
 	removedBullets := make([]*Bullet, 0, cap(g.Bullets))
 	for _, bullet := range g.Bullets {
 		if !bullet.ShouldRemove {
@@ -138,6 +133,22 @@ func (g *Game) Update(commands []string) {
 	}
 
 	g.Frame += 1
+}
+
+func (g *Game) handleCommands(commands []string) {
+	for _, command := range commands {
+		switch command {
+		case "left":
+			g.Player.X -= 1
+			g.Player.X = Clamp(X_MIN, g.Player.X, X_MAX)
+		case "right":
+			g.Player.X += 1
+			g.Player.X = Clamp(X_MIN, g.Player.X, X_MAX-2)
+		case "shoot":
+			g.shoot()
+		}
+	}
+
 }
 
 func (g *Game) spawnTarget() {
