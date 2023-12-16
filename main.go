@@ -58,6 +58,8 @@ func main() {
 	running := true
 	game := m.NewGame()
 
+	printUsage()
+
 	for running {
 		commands := GetCommands()
 		if commands == nil {
@@ -74,6 +76,15 @@ func main() {
 		playSounds(game, resources)
 		time.Sleep((1000 / FPS) * time.Millisecond)
 	}
+}
+
+func printUsage() {
+	fmt.Printf("Keys:\n")
+	fmt.Printf("  Left   : Move player left\n")
+	fmt.Printf("  Right  : Move player right\n")
+	fmt.Printf("  Shift  : Shoot\n")
+	fmt.Printf("  Escape : Quit game\n")
+	fmt.Printf("  Space  : Restart game\n")
 }
 
 func GetCommands() []string {

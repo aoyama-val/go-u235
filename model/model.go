@@ -170,6 +170,10 @@ func (g *Game) checkCollision() {
 
 		for _, target := range g.Targets {
 			if bullet.X == target.X && bullet.Y == target.Y {
+				g.Score += 1
+				if g.Score > g.HighScore {
+					g.HighScore = g.Score
+				}
 				bullet.ShouldRemove = true
 				target.ShouldRemove = true
 				newBullets = append(newBullets, &Bullet{X: bullet.X, Y: bullet.Y, Direction: DIRECTION_LEFT})
