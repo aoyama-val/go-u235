@@ -69,6 +69,11 @@ func NewGame() *Game {
 
 	g := &Game{}
 	g.Rng = rng
+	g.Reset()
+	return g
+}
+
+func (g *Game) Reset() {
 	g.IsOver = false
 	g.Frame = 0
 	g.Player = &Player{
@@ -77,7 +82,7 @@ func NewGame() *Game {
 	}
 	g.Bullets = make([]*Bullet, 0, 10)
 	g.Targets = make([]*Target, 0, 100)
-	return g
+	g.Score = 0
 }
 
 func (g *Game) Update(commands []string) {

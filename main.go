@@ -28,6 +28,8 @@ type Resources struct {
 }
 
 func main() {
+	// [SDL2の使い方 - mirichiの日記](https://mirichi.hatenadiary.org/entry/20141018/p1)
+
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
 		panic(err)
 	}
@@ -64,6 +66,11 @@ func main() {
 		commands := GetCommands()
 		if commands == nil {
 			running = false
+			break
+		}
+		if game.IsOver && len(commands) > 0 && commands[0] == "restart" {
+			game.Reset()
+			continue
 		}
 		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 			switch event.(type) {
@@ -101,6 +108,9 @@ func GetCommands() []string {
 	}
 	if keyState[sdl.SCANCODE_ESCAPE] != 0 {
 		commands = nil
+	}
+	if keyState[sdl.SCANCODE_SPACE] != 0 {
+		commands = append(commands, "restart")
 	}
 	return commands
 }
