@@ -59,7 +59,11 @@ type Game struct {
 	RequestedSounds []string
 }
 
-func Clamp(min int, val int, max int) int {
+type Ordered interface {
+	int | int8 | int16 | int32 | int64 | float32 | float64
+}
+
+func Clamp[T Ordered](min T, val T, max T) T {
 	if val < min {
 		return min
 	}
