@@ -41,6 +41,8 @@ func main() {
 	}
 	defer window.Destroy()
 
+	sdl.ShowCursor(sdl.DISABLE)
+
 	renderer, err := sdl.CreateRenderer(window, -1, sdl.RENDERER_ACCELERATED)
 	if err != nil {
 		panic(err)
@@ -87,11 +89,11 @@ func main() {
 
 func printUsage() {
 	fmt.Printf("Keys:\n")
-	fmt.Printf("  Left   : Move player left\n")
-	fmt.Printf("  Right  : Move player right\n")
-	fmt.Printf("  Shift  : Shoot\n")
-	fmt.Printf("  Escape : Quit game\n")
-	fmt.Printf("  Space  : Restart game\n")
+	fmt.Printf("    Left   : Move player left\n")
+	fmt.Printf("    Right  : Move player right\n")
+	fmt.Printf("    Shift  : Shoot\n")
+	fmt.Printf("    Escape : Quit game\n")
+	fmt.Printf("    Space  : Restart when game over\n")
 }
 
 func GetCommands() []string {
