@@ -25,9 +25,10 @@ type Player struct {
 }
 
 type Bullet struct {
-	X         int
-	Y         int
-	Direction int
+	X            int
+	Y            int
+	Direction    int
+	ShouldRemove bool
 }
 
 type Target struct {
@@ -77,21 +78,60 @@ func NewGame() *Game {
 	return g
 }
 
-func (g *Game) Update(command string) {
+func (g *Game) Update(commands []string) {
 	if g.IsOver {
 		return
 	}
 
-	switch command {
-	case "left":
-		g.Player.X -= 1
-		g.Player.X = Clamp(X_MIN, g.Player.X, X_MAX)
-	case "right":
-		g.Player.X += 1
-		g.Player.X = Clamp(X_MIN, g.Player.X, X_MAX-2)
-	case "shoot":
-		g.shoot()
+	for _, command := range commands {
+		switch command {
+		case "left":
+			g.Player.X -= 1
+			g.Player.X = Clamp(X_MIN, g.Player.X, X_MAX)
+		case "right":
+			g.Player.X += 1
+			g.Player.X = Clamp(X_MIN, g.Player.X, X_MAX-2)
+		case "shoot":
+			g.shoot()
+		}
 	}
+
+	for _, bullet := range g.Bullets {
+		switch bullet.Direction {
+		case DIRECTION_LEFT:
+			if bullet.X == X_MIN {
+				bullet.Direction = DIRECTION_RIGHT
+			} else {
+				bullet.X -= 1
+			}
+		case DIRECTION_RIGHT:
+			if bullet.X == X_MAX {
+				bullet.Direction = DIRECTION_LEFT
+			} else {
+				bullet.X += 1
+			}
+		case DIRECTION_UP:
+			if bullet.Y == Y_MIN {
+				bullet.Direction = DIRECTION_DOWN
+			} else {
+				bullet.Y -= 1
+			}
+		case DIRECTION_DOWN:
+			if bullet.Y == Y_MAX {
+				bullet.ShouldRemove = true
+			} else {
+				bullet.Y += 1
+			}
+		}
+	}
+
+	removedBullets := make([]*Bullet, 0, cap(g.Bullets))
+	for _, bullet := range g.Bullets {
+		if !bullet.ShouldRemove {
+			removedBullets = append(removedBullets, bullet)
+		}
+	}
+	g.Bullets = removedBullets
 
 	if g.Frame%60 == 0 {
 		g.spawnTarget()

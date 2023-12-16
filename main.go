@@ -59,33 +59,28 @@ func main() {
 	game := m.NewGame()
 
 	for running {
-		command := ""
+		commands := make([]string, 0, 3)
+		keyState := sdl.GetKeyboardState()
+		if keyState[sdl.SCANCODE_LEFT] != 0 {
+			commands = append(commands, "left")
+		}
+		if keyState[sdl.SCANCODE_RIGHT] != 0 {
+			commands = append(commands, "right")
+		}
+		if keyState[sdl.SCANCODE_LSHIFT] != 0 || keyState[sdl.SCANCODE_RSHIFT] != 0 {
+			commands = append(commands, "shoot")
+		}
+		if keyState[sdl.SCANCODE_ESCAPE] != 0 {
+			running = false
+		}
 		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-			switch t := event.(type) {
+			switch event.(type) {
 			case *sdl.QuitEvent:
 				running = false
-			case *sdl.KeyboardEvent:
-				if t.State == sdl.PRESSED {
-					keyCode := t.Keysym.Sym
-					switch keyCode {
-					case sdl.K_ESCAPE:
-						running = false
-					case sdl.K_LEFT:
-						command = "left"
-					case sdl.K_RIGHT:
-						command = "right"
-					case sdl.K_LSHIFT:
-						command = "shoot"
-						chunk := resources.chunks["hit.wav"]
-						chunk.Play(-1, 0)
-					case sdl.K_RSHIFT:
-						command = "shoot"
-					}
-				}
 			}
 		}
 		game.Score += 1
-		game.Update(command)
+		game.Update(commands)
 		render(renderer, window, game, resources)
 		time.Sleep((1000 / FPS) * time.Millisecond)
 	}
